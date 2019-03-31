@@ -8,6 +8,7 @@ topdir="$(pwd)"
 
 target=arm-eabi
 prefix="$topdir/dist/$target"
+sysroot="$prefix/$target"
 export PATH="$prefix/bin:$PATH"
 
 
@@ -17,7 +18,11 @@ binutils_builddir="build/$target/binutils"
 mkdir -p $binutils_builddir
 pushd $binutils_builddir
 
-"$topdir/binutils/configure" --target="$target" --prefix="$prefix" --with-sysroot --disable-nls --disable-werror
+export CC="gcc-8"
+export CXX="g++-8"
+
+"$topdir/binutils/configure" --target="$target" --prefix="$prefix" --with-sysroot="$sysroot" --disable-nls --disable-werror --enable-multilib --enable-ld=default --enable-gold=yes --enable-threads --enable-plugins
+
 make --jobs $(nproc)
 make install
 
