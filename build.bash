@@ -11,15 +11,18 @@ prefix="$topdir/dist/$target"
 sysroot="$prefix/$target"
 export PATH="$prefix/bin:$PATH"
 
+export CC="gcc-8"
+export CXX="g++-8"
+
+export CPPFLAGS="-I/usr/local/include"
+export LDFLAGS="-L/usr/local/lib"
+
 
 # binutils
 
-binutils_builddir="build/$target/binutils"
+binutils_builddir="$topdir/build/$target/binutils"
 mkdir -p $binutils_builddir
 pushd $binutils_builddir
-
-export CC="gcc-8"
-export CXX="g++-8"
 
 "$topdir/binutils/configure" --target="$target" --prefix="$prefix" --with-sysroot="$sysroot" --disable-nls --disable-werror --enable-multilib --enable-ld=default --enable-gold=yes --enable-threads --enable-plugins
 
