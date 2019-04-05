@@ -30,13 +30,13 @@ which -- "$target-as" || echo "$target-as" is not in the PATH
 
 # first pass gcc
 
-gcc1_builddir="$topdir/build/$target/gcc1"
-mkdir -p $gcc1_builddir
-gcc1_distdir="$topdir/build/$target/gcc1-dist"
-mkdir -p $gcc1_distdir
-pushd $gcc1_builddir
+core_gcc_builddir="$topdir/build/$target/core-gcc"
+mkdir -p $core_gcc_builddir
+core_gcc_distdir="$topdir/build/$target/core-gcc"
+mkdir -p $core_gcc_distdir
+pushd $core_gcc_builddir
 
-"$topdir/gcc/configure" --quiet --target="$target" --prefix="$gcc1_distdir" --without-headers --disable-shared --enable-__cxa_atexit --disable-libgomp --disable-libmudflap --disable-libmpx --disable-libssp --disable-libquadmath --disable-libquadmath-support --enable-target-optspace --disable-nls --enable-multiarch --enable-languages=c
+"$topdir/gcc/configure" --quiet --target="$target" --prefix="$core_gcc_distdir" --without-headers --disable-shared --enable-__cxa_atexit --disable-libgomp --disable-libmudflap --disable-libmpx --disable-libssp --disable-libquadmath --disable-libquadmath-support --enable-target-optspace --disable-nls --enable-multiarch --enable-languages=c
 
 make --jobs $(nproc) all-gcc all-target-libgcc
 make install-gcc install-target-libgcc
@@ -50,7 +50,7 @@ newlib_builddir="build/$target/newlib"
 mkdir -p $newlib_builddir
 pushd $newlib_builddir
 
-NEWLIB_BUILD_PATH="$gcc1_distdir/bin:$sysroot/bin:$PATH"
+NEWLIB_BUILD_PATH="$core_gcc_distdir/bin:$sysroot/bin:$PATH"
 
 PATH="$NEWLIB_BUILD_PATH" CFLAGS_FOR_TARGET="-mthumb-interwork -ffunction-sections -fdata-sections" "$topdir/newlib/configure" --quiet --target="$target" --prefix="$prefix" --enable-newlib-io-float --disable-newlib-io-long-double --enable-newlib-supplied-syscalls --disable-newlib-io-pos-args --enable-newlib-io-c99-formats --enable-newlib-io-long-long --disable-newlib-register-fini --disable-newlib-nano-malloc --disable-newlib-nano-formatted-io --disable-newlib-atexit-dynamic-alloc --enable-newlib-global-atexit --disable-lite-exit --enable-newlib-reent-small --enable-newlib-multithread --disable-newlib-wide-orient --disable-newlib-unbuf-stream-opt --enable-target-optspace
 
