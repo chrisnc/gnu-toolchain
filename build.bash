@@ -18,7 +18,7 @@ binutils_builddir="$topdir/build/$target/binutils"
 mkdir -p $binutils_builddir
 pushd $binutils_builddir
 
-"$topdir/binutils/configure" --quiet --target="$target" --prefix="$prefix" --with-sysroot="$sysroot" --disable-nls --disable-werror --enable-multilib --enable-ld=default --enable-gold=yes --enable-threads --enable-plugins
+"$topdir/binutils/configure" --quiet --target="$target" --prefix="$prefix" --with-sysroot="$sysroot" --disable-nls --disable-werror --enable-ld=default --enable-gold=yes --enable-multilib --enable-plugins --enable-lto
 
 make --jobs $(nproc) CXXFLAGS="-std=gnu++14 -g -O2"
 make install
@@ -36,7 +36,7 @@ core_gcc_distdir="$topdir/build/$target/core-gcc"
 mkdir -p $core_gcc_distdir
 pushd $core_gcc_builddir
 
-"$topdir/gcc/configure" --quiet --target="$target" --prefix="$core_gcc_distdir" --without-headers --disable-shared --enable-__cxa_atexit --disable-libgomp --disable-libmudflap --disable-libmpx --disable-libssp --disable-libquadmath --disable-libquadmath-support --enable-target-optspace --disable-nls --enable-multiarch --enable-languages=c
+"$topdir/gcc/configure" --quiet --target="$target" --prefix="$core_gcc_distdir" --without-headers --disable-shared --enable-__cxa_atexit --disable-libgomp --disable-libmudflap --disable-libmpx --disable-libssp --disable-libquadmath --disable-libquadmath-support --enable-target-optspace --disable-nls --disable-libstdc++-v3 --enable-multilib --enable-lto --enable-languages=c
 
 make --jobs $(nproc) all-gcc all-target-libgcc
 make install-gcc install-target-libgcc
@@ -52,9 +52,10 @@ pushd $newlib_builddir
 
 NEWLIB_BUILD_PATH="$core_gcc_distdir/bin:$sysroot/bin:$PATH"
 
-PATH="$NEWLIB_BUILD_PATH" CFLAGS_FOR_TARGET="-mthumb-interwork -ffunction-sections -fdata-sections" "$topdir/newlib/configure" --quiet --target="$target" --prefix="$prefix" --enable-newlib-io-float --disable-newlib-io-long-double --enable-newlib-supplied-syscalls --disable-newlib-io-pos-args --enable-newlib-io-c99-formats --enable-newlib-io-long-long --disable-newlib-register-fini --disable-newlib-nano-malloc --disable-newlib-nano-formatted-io --disable-newlib-atexit-dynamic-alloc --enable-newlib-global-atexit --disable-lite-exit --enable-newlib-reent-small --enable-newlib-multithread --disable-newlib-wide-orient --disable-newlib-unbuf-stream-opt --enable-target-optspace
+PATH="$NEWLIB_BUILD_PATH" CFLAGS_FOR_TARGET="-mthumb-interwork -ffunction-sections -fdata-sections" "$topdir/newlib/configure" --quiet --target="$target" --prefix="$prefix" --enable-ld=default --enable-gold=yes --enable-multilib --enable-newlib-io-float --disable-newlib-io-long-double --enable-newlib-supplied-syscalls --disable-newlib-io-pos-args --enable-newlib-io-c99-formats --enable-newlib-io-long-long --disable-newlib-register-fini --disable-newlib-nano-malloc --disable-newlib-nano-formatted-io --disable-newlib-atexit-dynamic-alloc --enable-newlib-global-atexit --disable-lite-exit --enable-newlib-reent-small --enable-newlib-multithread --disable-newlib-wide-orient --disable-newlib-unbuf-stream-opt --enable-target-optspace --enable-lto
 
-PATH="$NEWLIB_BUILD_PATH" make --jobs $(nproc) && make install
+PATH="$NEWLIB_BUILD_PATH" make --jobs $(nproc) &&
+PATH="$NEWLIB_BUILD_PATH" make install
 
 popd
 
@@ -65,9 +66,9 @@ gcc_builddir="$topdir/build/$target/gcc"
 mkdir -p $gcc_builddir
 pushd $gcc_builddir
 
-"$topdir/gcc/configure" --quiet --target="$target" --prefix="$prefix" --with-sysroot="$sysroot" --with-newlib --disable-shared --enable-__cxa_atexit --disable-libgomp --disable-libmudflap --disable-libmpx --disable-libssp --disable-libquadmath --disable-libquadmath-support --enable-target-optspace --disable-nls --enable-multiarch --enable-languages=c,c++
+"$topdir/gcc/configure" --quiet --target="$target" --prefix="$prefix" --with-sysroot="$sysroot" --with-newlib --disable-shared --enable-__cxa_atexit --disable-libgomp --disable-libmudflap --disable-libmpx --disable-libssp --disable-libquadmath --disable-libquadmath-support --enable-target-optspace --enable-multilib --enable-lto --disable-nls --enable-languages=c,c++
 
-make --jobs $(nproc) all-gcc all-target-libgcc
-make install-gcc install-target-libgcc
+make --jobs $(nproc)
+make install
 
 popd
