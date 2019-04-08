@@ -61,13 +61,11 @@ popd
 
 # final gcc config
 
-gcc_builddir="$topdir/build/$target/gcc1"
+gcc_builddir="$topdir/build/$target/gcc"
 mkdir -p $gcc_builddir
 pushd $gcc_builddir
 
 "$topdir/gcc/configure" --quiet --target="$target" --prefix="$prefix" --with-sysroot="$sysroot" --with-newlib --disable-shared --enable-__cxa_atexit --disable-libgomp --disable-libmudflap --disable-libmpx --disable-libssp --disable-libquadmath --disable-libquadmath-support --enable-target-optspace --disable-nls --enable-multiarch --enable-languages=c,c++
-#CPPFLAGS_FOR_TARGET="-idirafter $sysroot/include" LDFLAGS_FOR_TARGET="-static" 
-# --with-local-prefix="$sysroot"
 
 make --jobs $(nproc) all-gcc all-target-libgcc
 make install-gcc install-target-libgcc
