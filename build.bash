@@ -11,16 +11,15 @@ prefix="$topdir/dist/$target"
 sysroot="$prefix/$target"
 export PATH="$prefix/bin:$PATH"
 
-
 # binutils
 
 binutils_builddir="$topdir/build/$target/binutils"
 mkdir -p $binutils_builddir
 pushd $binutils_builddir
 
-"$topdir/binutils/configure" --quiet --target="$target" --prefix="$prefix" --with-sysroot="$sysroot" --disable-nls --disable-werror --enable-ld=default --enable-gold=yes --enable-multilib --enable-plugins --enable-lto
+CXXFLAGS="-g -O2 -std=gnu++14" "$topdir/binutils/configure" --quiet --target="$target" --prefix="$prefix" --with-sysroot="$sysroot" --disable-nls --disable-werror --enable-ld=default --enable-gold=yes --enable-multilib --enable-plugins --enable-lto
 
-make --jobs $(nproc) CXXFLAGS="-std=gnu++14 -g -O2"
+make --jobs $(nproc)
 make install
 
 popd
@@ -72,3 +71,23 @@ make --jobs $(nproc)
 make install
 
 popd
+
+
+# gcc config
+#CPPFLAGS_FOR_TARGET="-idirafter $sysroot/include" LDFLAGS_FOR_TARGET="-static"
+# --with-local-prefix="$sysroot"
+#'--enable-threads=no'
+#CFLAGS and CXXFLAGS -pipe
+#LDFLAGS -static
+
+# gdb config
+#--with-build-sysroot
+#'--includedir=/Users/chrisnc/projects/toolchain-armeb/armeb-eabi/armeb-eabi/include'
+#'--with-python=/usr/bin/python2.7'
+#'--disable-binutils'
+#'--disable-ld'
+#'--disable-gas'
+#'--disable-threads'
+#'--disable-nls'
+#'--with-expat'
+#'--without-libexpat-prefix'
