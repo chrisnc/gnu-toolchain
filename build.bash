@@ -51,7 +51,7 @@ pushd $newlib_builddir
 
 NEWLIB_BUILD_PATH="$core_gcc_distdir/bin:$sysroot/bin:$PATH"
 
-PATH="$NEWLIB_BUILD_PATH" CFLAGS_FOR_TARGET="-mthumb-interwork -ffunction-sections -fdata-sections" "$topdir/newlib/configure" --quiet --target="$target" --prefix="$prefix" --enable-ld=default --enable-gold=yes --enable-multilib --enable-newlib-io-float --disable-newlib-io-long-double --enable-newlib-supplied-syscalls --disable-newlib-io-pos-args --enable-newlib-io-c99-formats --enable-newlib-io-long-long --disable-newlib-register-fini --disable-newlib-nano-malloc --disable-newlib-nano-formatted-io --disable-newlib-atexit-dynamic-alloc --enable-newlib-global-atexit --disable-lite-exit --enable-newlib-reent-small --enable-newlib-multithread --disable-newlib-wide-orient --disable-newlib-unbuf-stream-opt --enable-target-optspace --enable-lto
+PATH="$NEWLIB_BUILD_PATH" CFLAGS_FOR_TARGET="-ffunction-sections -fdata-sections" "$topdir/newlib/configure" --quiet --target="$target" --prefix="$prefix" --enable-ld=default --enable-gold=yes --enable-multilib --enable-newlib-io-float --disable-newlib-io-long-double --enable-newlib-supplied-syscalls --disable-newlib-io-pos-args --enable-newlib-io-c99-formats --enable-newlib-io-long-long --disable-newlib-register-fini --disable-newlib-nano-malloc --disable-newlib-nano-formatted-io --disable-newlib-atexit-dynamic-alloc --enable-newlib-global-atexit --disable-lite-exit --enable-newlib-reent-small --enable-newlib-multithread --disable-newlib-wide-orient --disable-newlib-unbuf-stream-opt --enable-target-optspace --enable-lto
 
 PATH="$NEWLIB_BUILD_PATH" make --jobs $(nproc) &&
 PATH="$NEWLIB_BUILD_PATH" make install
