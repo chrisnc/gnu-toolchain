@@ -10,12 +10,13 @@ sysroot = $(prefix)/$(target)
 binutils_build = $(topdir)/build/$(target)/binutils
 gcc_first_build = $(topdir)/build/$(target)/gcc_first
 newlib_build = $(topdir)/build/$(target)/newlib
+gcc_build = $(topdir)/build/$(target)/gcc
 
 export PATH := $(prefix)/bin:$(PATH)
 
 
 .PHONY: default
-default: $(sysroot)/lib/libc.a
+default: $(prefix)/bin/$(target)-gcc
 
 # binutils
 
@@ -37,11 +38,11 @@ $(gcc_first_build)/Makefile: gcc $(prefix)/bin/$(target)-as
 	cd $(gcc_first_build) && \
 	"$(topdir)/gcc/configure" --quiet --target="$(target)" --prefix="$(prefix)" --with-sysroot="$(sysroot)" --with-newlib --without-headers --disable-shared --enable-__cxa_atexit --disable-libgomp --disable-libmudflap --disable-libmpx --disable-libssp --disable-libquadmath --disable-libquadmath-support --disable-decimal-float --enable-target-optspace --disable-nls --disable-libstdc++-v3 --enable-multilib --enable-lto --enable-languages=c
 
-$(prefix)/bin/$(target)-gcc: $(gcc_first_build)/Makefile
+$(gcc_first_build)/install.stmp: $(gcc_first_build)/Makefile
 	cd $(gcc_first_build) && \
 	make --jobs $(nproc) all-gcc all-target-libgcc && \
-	make install-gcc install-target-libgcc
-	touch $(gcc_first_build)/install.stmp
+	make install-gcc install-target-libgcc && \
+	touch install.stmp
 
 
 # newlib
@@ -53,5 +54,18 @@ $(newlib_build)/Makefile: newlib $(gcc_first_build)/install.stmp
 
 $(sysroot)/lib/libc.a: $(newlib_build)/Makefile
 	cd "$(newlib_build)" && \
+	make --jobs $(nproc) && \
+	make install
+
+
+# gcc (and libstdc++)
+
+$(gcc_build)/Makefile: gcc $(sysroot)/lib/libc.a
+	mkdir -p $(gcc_build) && \
+	cd $(gcc_build) && \
+	"$(topdir)/gcc/configure" --quiet --target="$(target)" --prefix="$(prefix)" --with-sysroot="$(sysroot)" --with-newlib --disable-shared --enable-__cxa_atexit --disable-libgomp --disable-libmudflap --disable-libmpx --disable-libssp --disable-libquadmath --disable-libquadmath-support --enable-target-optspace --enable-multilib --enable-lto --disable-nls --enable-languages=c,c++
+
+$(prefix)/bin/$(target)-gcc: $(gcc_build)/Makefile
+	cd $(gcc_build) && \
 	make --jobs $(nproc) && \
 	make install
