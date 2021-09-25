@@ -19,8 +19,8 @@ default: $(prefix)/bin/$(target)-gcc
 UNAME := $(shell uname)
 
 ifeq ($(UNAME), Darwin)
-export CC := gcc-10
-export CXX := g++-10
+export CC := gcc-11
+export CXX := g++-11
 libprefix := /usr/local/opt
 withlibflags := --with-mpfr=$(libprefix)/mpfr --with-mpc=$(libprefix)/libmpc --with-gmp=$(libprefix)/gmp
 endif
