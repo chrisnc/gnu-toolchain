@@ -3,6 +3,7 @@
 topdir = $(shell pwd)
 nproc = $(shell nproc)
 
+target = arm-eabi
 prefix = $(topdir)/$(target)
 sysroot = $(prefix)/$(target)
 
@@ -30,7 +31,7 @@ endif
 $(binutils_build)/Makefile: binutils
 	mkdir -p $(binutils_build) && \
 	cd $(binutils_build) && \
-	"$(topdir)/binutils/configure" --quiet --target="$(target)" --prefix="$(prefix)" --with-sysroot="$(sysroot)" --disable-nls --disable-werror --disable-sim --disable-gdb --enable-ld=default --enable-gold=yes --enable-multilib --enable-plugins --enable-lto
+	CXXFLAGS="-g -O2 -std=gnu++14" "$(topdir)/binutils/configure" --quiet --target="$(target)" --prefix="$(prefix)" --with-sysroot="$(sysroot)" --disable-nls --disable-werror --disable-sim --disable-gdb --enable-lto --enable-ld=default --enable-gold=yes --enable-multilib --enable-plugins
 
 $(prefix)/bin/$(target)-as: $(binutils_build)/Makefile
 	cd "$(binutils_build)" && \
@@ -57,7 +58,7 @@ $(gcc_first_build)/install.stmp: $(gcc_first_build)/Makefile
 $(newlib_build)/Makefile: newlib $(gcc_first_build)/install.stmp
 	mkdir -p $(newlib_build) && \
 	cd $(newlib_build) && \
-	"$(topdir)/newlib/configure" --quiet --target="$(target)" --prefix="$(prefix)" --enable-multilib --disable-newlib-supplied-syscalls --disable-newlib-io-pos-args --enable-newlib-io-c99-formats --enable-newlib-io-long-long --enable-newlib-retargetable-locking --enable-newlib-register-fini --disable-newlib-nano-malloc --disable-newlib-nano-formatted-io --disable-newlib-atexit-dynamic-alloc --enable-newlib-global-atexit --disable-lite-exit --enable-newlib-reent-small --enable-newlib-multithread --disable-newlib-wide-orient --disable-newlib-unbuf-stream-opt --enable-target-optspace --enable-lto
+	CFLAGS_FOR_TARGET="-ffunction-sections -fdata-sections" "$(topdir)/newlib/configure" --quiet --target="$(target)" --prefix="$(prefix)" --enable-multilib --disable-newlib-io-pos-args --enable-newlib-io-c99-formats --enable-newlib-io-long-long --enable-newlib-retargetable-locking --enable-newlib-register-fini --enable-newlib-nano-malloc --enable-newlib-nano-formatted-io --disable-newlib-atexit-dynamic-alloc --enable-newlib-global-atexit --enable-lite-exit --enable-newlib-reent-small --enable-newlib-multithread --disable-newlib-wide-orient --disable-newlib-unbuf-stream-opt --enable-target-optspace --enable-lto
 
 $(sysroot)/lib/libc.a: $(newlib_build)/Makefile
 	cd "$(newlib_build)" && \
