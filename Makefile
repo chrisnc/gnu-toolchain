@@ -20,8 +20,8 @@ default: $(prefix)/bin/$(target)-gcc
 UNAME := $(shell uname)
 
 ifeq ($(UNAME), Darwin)
-export CC := gcc-11
-export CXX := g++-11
+export CC := gcc-12
+export CXX := g++-12
 libprefix := /usr/local/opt
 withlibflags := --with-mpfr=$(libprefix)/mpfr --with-mpc=$(libprefix)/libmpc --with-gmp=$(libprefix)/gmp
 endif
@@ -31,7 +31,7 @@ endif
 $(binutils_build)/Makefile: binutils
 	mkdir -p $(binutils_build) && \
 	cd $(binutils_build) && \
-	CXXFLAGS="-g -O2 -std=gnu++14" "$(topdir)/binutils/configure" --quiet --target="$(target)" --prefix="$(prefix)" --with-sysroot="$(sysroot)" --disable-nls --disable-werror --disable-sim --disable-gdb --enable-lto --enable-ld=default --enable-gold=yes --enable-multilib --enable-plugins
+	CXXFLAGS="-O3" "$(topdir)/binutils/configure" --quiet --target="$(target)" --prefix="$(prefix)" --with-sysroot="$(sysroot)" --disable-nls --disable-werror --disable-sim --disable-gdb --enable-lto --enable-ld=default --enable-gold=yes --enable-multilib --enable-plugins
 
 $(prefix)/bin/$(target)-as: $(binutils_build)/Makefile
 	cd "$(binutils_build)" && \
@@ -58,7 +58,7 @@ $(gcc_first_build)/install.stmp: $(gcc_first_build)/Makefile
 $(newlib_build)/Makefile: newlib $(gcc_first_build)/install.stmp
 	mkdir -p $(newlib_build) && \
 	cd $(newlib_build) && \
-	CFLAGS_FOR_TARGET="-ffunction-sections -fdata-sections" "$(topdir)/newlib/configure" --quiet --target="$(target)" --prefix="$(prefix)" --enable-multilib --disable-newlib-io-pos-args --enable-newlib-io-c99-formats --enable-newlib-io-long-long --enable-newlib-retargetable-locking --enable-newlib-register-fini --enable-newlib-nano-malloc --enable-newlib-nano-formatted-io --disable-newlib-atexit-dynamic-alloc --enable-newlib-global-atexit --enable-lite-exit --enable-newlib-reent-small --enable-newlib-multithread --disable-newlib-wide-orient --disable-newlib-unbuf-stream-opt --enable-target-optspace --enable-lto
+	CFLAGS_FOR_TARGET="-ffunction-sections -fdata-sections -O3" "$(topdir)/newlib/configure" --quiet --target="$(target)" --prefix="$(prefix)" --enable-multilib --disable-newlib-io-pos-args --enable-newlib-io-c99-formats --enable-newlib-io-long-long --enable-newlib-retargetable-locking --enable-newlib-register-fini --enable-newlib-nano-malloc --enable-newlib-nano-formatted-io --disable-newlib-atexit-dynamic-alloc --enable-newlib-global-atexit --enable-lite-exit --enable-newlib-reent-small --enable-newlib-multithread --disable-newlib-wide-orient --disable-newlib-unbuf-stream-opt --enable-target-optspace --enable-lto
 
 $(sysroot)/lib/libc.a: $(newlib_build)/Makefile
 	cd "$(newlib_build)" && \
