@@ -12,7 +12,6 @@ gcc_first_build = $(topdir)/build/$(target)/gcc_first
 newlib_build = $(topdir)/build/$(target)/newlib
 gcc_build = $(topdir)/build/$(target)/gcc
 
-export PATH := $(prefix)/bin:$(PATH)
 
 .PHONY: default
 default: $(prefix)/bin/$(target)-gcc
@@ -20,18 +19,24 @@ default: $(prefix)/bin/$(target)-gcc
 UNAME := $(shell uname)
 
 ifeq ($(UNAME), Darwin)
+export PATH := $(HOMEBREW_PREFIX)/opt/coreutils/libexec/gnubin:$(PATH)
+export PATH := $(HOMEBREW_PREFIX)/opt/gnu-sed/libexec/gnubin:$(PATH)
+export PATH := $(HOMEBREW_PREFIX)/opt/texinfo/bin:$(PATH)
+export PATH := $(HOMEBREW_PREFIX)/opt/gcc/bin:$(PATH)
 export CC := gcc-12
 export CXX := g++-12
-libprefix := /usr/local/opt
-withlibflags := --with-mpfr=$(libprefix)/mpfr --with-mpc=$(libprefix)/libmpc --with-gmp=$(libprefix)/gmp
+export CFLAGS := -I$(HOMEBREW_PREFIX)/include
+export LDFLAGS := -L$(HOMEBREW_PREFIX)/lib
 endif
+
+export PATH := $(prefix)/bin:$(PATH)
 
 # binutils
 
 $(binutils_build)/Makefile: binutils
 	mkdir -p $(binutils_build) && \
 	cd $(binutils_build) && \
-	CXXFLAGS="-O3" "$(topdir)/binutils/configure" --quiet --target="$(target)" --prefix="$(prefix)" --with-sysroot="$(sysroot)" --disable-nls --disable-werror --disable-sim --disable-gdb --enable-lto --enable-ld=default --enable-gold=yes --enable-multilib --enable-plugins
+	"$(topdir)/binutils/configure" --quiet --target="$(target)" --prefix="$(prefix)" --with-sysroot="$(sysroot)" --disable-nls --disable-decimal-float --disable-werror --disable-sim --enable-ld=yes --enable-gold=default --enable-multilib --enable-plugins --disable-gdb
 
 $(prefix)/bin/$(target)-as: $(binutils_build)/Makefile
 	cd "$(binutils_build)" && \
@@ -44,7 +49,7 @@ $(prefix)/bin/$(target)-as: $(binutils_build)/Makefile
 $(gcc_first_build)/Makefile: gcc $(prefix)/bin/$(target)-as
 	mkdir -p $(gcc_first_build) && \
 	cd $(gcc_first_build) && \
-	"$(topdir)/gcc/configure" --quiet --target="$(target)" --prefix="$(prefix)" --with-sysroot="$(sysroot)" --with-newlib --without-headers --disable-shared --enable-__cxa_atexit --disable-libgomp --disable-libmudflap --disable-libmpx --disable-libssp --disable-libquadmath --disable-libquadmath-support --disable-decimal-float --enable-target-optspace --disable-nls --disable-libstdc++-v3 --enable-multilib --enable-lto --enable-languages=c $(withlibflags)
+	"$(topdir)/gcc/configure" --quiet --target="$(target)" --prefix="$(prefix)" --with-sysroot="$(sysroot)" --with-newlib --without-headers --disable-shared --enable-__cxa_atexit --disable-libgomp --disable-libmudflap --disable-libmpx --disable-libssp --disable-libquadmath --disable-libquadmath-support --disable-decimal-float --enable-target-optspace --disable-nls --enable-libstdc++-v3 --enable-multilib --enable-languages=c,c++
 
 $(gcc_first_build)/install.stmp: $(gcc_first_build)/Makefile
 	cd $(gcc_first_build) && \
@@ -71,7 +76,7 @@ $(sysroot)/lib/libc.a: $(newlib_build)/Makefile
 $(gcc_build)/Makefile: gcc $(sysroot)/lib/libc.a
 	mkdir -p $(gcc_build) && \
 	cd $(gcc_build) && \
-	"$(topdir)/gcc/configure" --quiet --target="$(target)" --prefix="$(prefix)" --with-sysroot="$(sysroot)" --with-newlib --disable-shared --enable-__cxa_atexit --disable-libgomp --disable-libmudflap --disable-libmpx --disable-libssp --disable-libquadmath --disable-libquadmath-support --enable-target-optspace --enable-multilib --enable-lto --disable-nls --enable-languages=c $(withlibflags)
+	"$(topdir)/gcc/configure" --quiet --target="$(target)" --prefix="$(prefix)" --with-sysroot="$(sysroot)" --with-newlib --disable-shared --enable-__cxa_atexit --disable-libgomp --disable-libmudflap --disable-libmpx --disable-libssp --disable-libquadmath --disable-libquadmath-support --enable-target-optspace --enable-multilib --disable-nls --enable-languages=c
 
 $(prefix)/bin/$(target)-gcc: $(gcc_build)/Makefile
 	cd $(gcc_build) && \
